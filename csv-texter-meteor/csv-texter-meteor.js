@@ -77,6 +77,8 @@ if (Meteor.isClient) {
   }
 }
 
+// BEGIN SERVER CODE -------------------------------------------------------------------
+
 if (Meteor.isServer) {
   Meteor.startup(function () {
 
@@ -89,12 +91,14 @@ if (Meteor.isServer) {
         'name': name,
         'data': grid
       });
+      console.log(name + ' uploaded');
     },
     send: function(column, message) {
-        console.log(column + ", " + message);
+        console.log('Sending: ' + column + ', ' + message);
     },
     clear: function() {
       Grids.remove({});
+      console.log('All data cleared');
     }
   });
 

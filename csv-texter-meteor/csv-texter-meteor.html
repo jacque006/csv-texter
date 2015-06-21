@@ -14,7 +14,9 @@
 
   <h1>CSV Texter</h1>
 
-  {{> uploadButton}}  
+  {{> uploadButton}}
+
+  {{> clearButton}}
 
   {{> gridTable}}
 </body>
@@ -22,6 +24,10 @@
 <template name="uploadButton">
 	<input class="input-file" id="fileInput" type="file" name="files[]">
 	<button id="upload">Upload</button>
+</template>
+
+<template name="clearButton">
+	<button id="clear">Clear</button>
 </template>
 
 <template name="gridTable">

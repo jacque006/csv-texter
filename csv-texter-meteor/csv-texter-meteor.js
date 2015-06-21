@@ -7,7 +7,8 @@ if (Meteor.isClient) {
     grids: function () { 
       var grids = Grids.find({}).fetch();
       grids.forEach(function(grid) {
-        grid.data = createTableFromGrid(grid.data);
+        // TODO Maybe we should have the server do this.
+        grid.data = createTableFromGrid(grid);
       });
       return grids;
     }
@@ -17,15 +18,17 @@ if (Meteor.isClient) {
     "click": function(event) {
       var id = event.target.id;
       if (id != null && id.length > 0) {
-        var pair = id.split(',');
-        var x = pair[0];
-        var y = pair[1];
+        var tuple = id.split(',');
+        var id = tuple[0];
+        var x = tuple[1];
+        var y = tuple[2];
 
         // Only take clicks from top column.
+        // TODO Allow for individual clicks on numbers.
         if (y < 1) {
           message = prompt("Enter a message to send to all numbers in this column");
           if (message != null) {
-            Meteor.call('send', x, message);
+            Meteor.call('send', id, x, message);
           }
         }
       }
@@ -58,7 +61,9 @@ if (Meteor.isClient) {
     }
   });
 
-  function createTableFromGrid(grid) {
+  function createTableFromGrid(gridItem) {
+    var grid = gridItem.data;
+
     var table = '';
 
     // We can always assume a 2d matrix.
@@ -66,7 +71,7 @@ if (Meteor.isClient) {
       table += '<tr>';
       for (var x = 0; x < grid.length; x++) {
         // For grid coordinates.
-        table += '<td id="' + x + ',' + y + '">';
+        table += '<td id="' + gridItem._id + ',' + x + ',' + y + '">';
         table += grid[x][y];
         table += '</td>';
       }
@@ -93,8 +98,8 @@ if (Meteor.isServer) {
       });
       console.log(name + ' uploaded');
     },
-    send: function(column, message) {
-        console.log('Sending: ' + column + ', ' + message);
+    send: function(id, column, message) {
+        console.log('Sending: ' + column + ', ' + message + ' from grid ' + id);
     },
     clear: function() {
       Grids.remove({});

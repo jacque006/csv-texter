@@ -99,7 +99,13 @@ if (Meteor.isServer) {
       console.log(name + ' uploaded');
     },
     send: function(id, column, message) {
-        console.log('Sending: ' + column + ', ' + message + ' from grid ' + id);
+        // Should only be one.
+        var item = Grids.find({'_id': id}).fetch()[0];
+        var itemColumn = item.data[column];
+        for (i = 1; i < itemColumn.length; itemColumn++) {
+          console.log(itemColumn[i]);
+        }
+        console.log('Sent: ' + column + ', ' + message + ' from grid ' + id);
     },
     clear: function() {
       Grids.remove({});

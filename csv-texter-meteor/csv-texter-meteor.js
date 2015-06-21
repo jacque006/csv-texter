@@ -6,10 +6,20 @@ if (Meteor.isClient) {
   Template.gridTable.helpers({
     tableHtml: function () { 
 
-    var grids = Grids.find({'id': 0}).fetch();
+      var grids = Grids.find({'id': 0}).fetch();
       if (grids && grids.length > 0 && grids[0] != null) {
         var grid = grids[0].data;
         return createTableFromGrid(grid);
+      }
+
+      return null;
+    },
+    tableName: function () {
+      // TODO HACKS Copypasta.
+      var grids = Grids.find({'id': 0}).fetch();
+      if (grids && grids.length > 0 && grids[0] != null) {
+        var name = grids[0].name;
+        return name;
       }
 
       return null;
@@ -39,8 +49,8 @@ if (Meteor.isClient) {
   Template.uploadButton.events({
     "click #upload": function(event) {
       var f = document.getElementById('fileInput').files[0];
-      readFile(f, function(content) {
-        Meteor.call('upload', content);
+      readFile(f, function(name, content) {
+        Meteor.call('upload', name, content);
       });
     }
   });
@@ -48,8 +58,8 @@ if (Meteor.isClient) {
   readFile = function(f, onLoadCallback) {
     var reader = new FileReader();
     reader.onload = function (event){
-      var contents = event.target.result
-      onLoadCallback(contents);
+      var content = event.target.result
+      onLoadCallback(f.name, content);
     }
     reader.readAsText(f);
   };
@@ -86,10 +96,11 @@ if (Meteor.isServer) {
   });
 
   return Meteor.methods({
-    upload: function(csv) {
-      var grid = createGridFromCSV(csv);
+    upload: function(name, content) {
+      var grid = createGridFromCSV(content);
       Grids.insert({
         'id': 0,
+        'name': name,
         'data': grid
       });
     },

@@ -3,30 +3,17 @@ Grids = new Mongo.Collection("grid");
 if (Meteor.isClient) {
 
   // Table
-  Template.gridTable.helpers({
-    tableHtml: function () { 
-
-      var grids = Grids.find({'id': 0}).fetch();
-      if (grids && grids.length > 0 && grids[0] != null) {
-        var grid = grids[0].data;
-        return createTableFromGrid(grid);
-      }
-
-      return null;
-    },
-    tableName: function () {
-      // TODO HACKS Copypasta.
-      var grids = Grids.find({'id': 0}).fetch();
-      if (grids && grids.length > 0 && grids[0] != null) {
-        var name = grids[0].name;
-        return name;
-      }
-
-      return null;
+  Template.multiGrid.helpers({
+    grids: function () { 
+      var grids = Grids.find({}).fetch();
+      grids.forEach(function(grid) {
+        grid.data = createTableFromGrid(grid.data);
+      });
+      return grids;
     }
   });
 
-  Template.gridTable.events({
+  Template.multiGrid.events({
     "click": function(event) {
       var id = event.target.id;
       if (id != null && id.length > 0) {
@@ -99,7 +86,6 @@ if (Meteor.isServer) {
     upload: function(name, content) {
       var grid = createGridFromCSV(content);
       Grids.insert({
-        'id': 0,
         'name': name,
         'data': grid
       });
